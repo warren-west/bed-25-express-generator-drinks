@@ -1,9 +1,15 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express')
+const router = express.Router()
+const { getDrinksFromApi } = require('../api/apiHelper')
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('drinks', { title: 'Drinks' });
-});
+/* GET /drinks */
+router.get('/', async function (req, res) {
+  // try fetch drink data to populate the drinksList
+  const drinks = await getDrinksFromApi()
+  console.log(`DRINKS.JS`)
+  console.log(drinks)
 
-module.exports = router;
+  res.render('drinks', { title: 'Drinks', drinks })
+})
+
+module.exports = router
