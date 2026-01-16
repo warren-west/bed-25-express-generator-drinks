@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <%- include('./partials/navbar.ejs') %>
+    <h1>Signup Page</h1>
+    <p>Please sign up to create an account</p>
+    <h3>User: <%= currentUser %></h3>
+    
+    <form action="/login/signup" method="post">
+        <label for="username">Username: </label>
+        <input type="text" id="username" name="username" placeholder="warren">
+        <br>
+        <label for="password">Password: </label>
+        <input type="password" id="password" name="password">
+        <br>
+        <label for="confirm-password">Confirm Password: </label>
+        <input type="password" id="confirm-password" name="confirmPassword">
+        <br>
+        <button type="submit">Click me</button>
+    </form>
+
+  </body>
+</html>

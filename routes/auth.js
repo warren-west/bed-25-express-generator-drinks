@@ -1,0 +1,91 @@
+// the imports auth.js needs
+const express = require('express')
+const passport = require('passport')
+const LocalStrategy = require('passport-local')
+const path = require("path")
+const fs = require('fs')
+
+// create the router object
+const router = express.Router()
+
+/** PASSPORT CONFIGURATION */
+passport.use(new LocalStrategy(function verify(username, password, cb) {
+    let usersArray = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../data/users.json")))
+    let filteredArray = usersArray.filter(x => x.username == username)
+    if (filteredArray.length > 0) {
+        let usersData = filteredArray[0]
+        if (usersData.password == password) {
+            return cb(null, usersData)
+        }
+    }
+    else {
+        return cb(null, false)
+    }
+}))
+
+passport.serializeUser((user, callback) => {
+    callback(null, user)
+})
+
+passport.deserializeUser((user, callback) => {
+    const userId = user ? user.username : ''
+    callback(null, userId)
+})
+
+/** ROUTER ENDPOINTS: */
+
+// GET /login
+router.get('/', (req, res) => {
+    const currentUser = req.user ? req.user : undefined
+    res.render('login', { currentUser })
+    res.end()
+})
+
+// GET /login/logout
+router.get('/logout', function (req, res, next) {
+    req.logout(function (err) {
+        if (err) { return next(err) }
+        res.redirect('/drinks')
+    })
+})
+
+// GET /login/signup
+router.get('/signup', (req, res) => {
+    const currentUser = req.user ? req.user : undefined
+    res.render('signup', { currentUser })
+})
+
+// POST /login
+router.post("/", passport.authenticate('local', { successRedirect: '/drinks', failureRedirect: '/login' }), (req, res) => {
+    req.session.currentUser = req.user
+    res.redirect('/')
+})
+
+// POST /login/signup
+router.post('/signup', (req, res) => {
+    const { username, password, confirmPassword } = req.body
+    console.log(req.body)
+
+    try {
+        const users = JSON.parse(fs.readFileSync('./data/users.json', 'utf8'))
+        const existingUser = users.find(u => u.username === username)
+
+        if (password !== confirmPassword) {
+            res.send('<script>alert("Passwords must match"); window.location.href="/login/signup";</script>')
+            return
+        }
+        if (existingUser) {
+            res.send('<script>alert("User already exists"); window.location.href="/login";</script>')
+            return
+        }
+
+        const newUser = { username, password }
+        users.push(newUser)
+        fs.writeFileSync('./data/users.json', JSON.stringify(users, null, 2))
+        res.redirect('/login')
+    } catch (err) {
+        res.redirect('/login/signup')
+    }
+})
+
+module.exports = router

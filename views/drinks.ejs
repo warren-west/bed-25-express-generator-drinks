@@ -9,17 +9,29 @@
 </head>
 
 <body>
+  <%- include('./partials/navbar.ejs') %>
   <h1>
     <%= title %>
   </h1>
-  <p>Welcome to <%= title %>
-  </p>
-
+  <p>Welcome to <%= title %>, <%= currentUser %></p>
   <ul>
-    <% drinks.forEach(function(drink){ %>
-      <li><%= drink.description %> <%= drink.price %> kr.</li>
+    <% drinksList.forEach(function(d){ %>
+      <li><%= d.description %> <%= d.price %> kr.</li>
+      <% if (currentUser) { %>
+        <button id="btn-view-details-<%= d.id %>" value="<%= d.id %>" onclick="handleViewDetailsClick()">View Details</button>
+      <% } %>
     <% }); %>
   </ul>
+
+  <script>
+    function handleViewDetailsClick() {
+      console.log(event.target.id)
+      console.log(event.target.value)
+
+      document.location.href = `/drinks/${event.target.value}`
+    }
+
+  </script>
 </body>
 
 </html>
