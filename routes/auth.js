@@ -11,16 +11,28 @@ const router = express.Router()
 /** PASSPORT CONFIGURATION */
 passport.use(new LocalStrategy(function verify(username, password, cb) {
     let usersArray = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../data/users.json")))
-    let filteredArray = usersArray.filter(x => x.username == username)
-    if (filteredArray.length > 0) {
-        let usersData = filteredArray[0]
-        if (usersData.password == password) {
-            return cb(null, usersData)
-        }
-    }
-    else {
+    
+    // first try find a user from users.json based on the username provided
+    let user = usersArray.find(x => x.username === username)
+
+    /** The code here was causing the bug, when trying to login with incorrect password
+    * Because that logical path was never catered for 
+    * We handled the case of finding a user matching the provided username
+    * We handled the case of not finding a user matching the provided username
+    * But we didn't handle the case of finding a user matching the provided username, but the password is incorrect.
+    * */
+    if (!user) {
+        // User not found
         return cb(null, false)
     }
+
+    if (user.password !== password) {
+        // User found, but password wrong
+        return cb(null, false)
+    }
+
+    // Success
+    return cb(null, user)
 }))
 
 passport.serializeUser((user, callback) => {
@@ -38,7 +50,6 @@ passport.deserializeUser((user, callback) => {
 router.get('/', (req, res) => {
     const currentUser = req.user ? req.user : undefined
     res.render('login', { currentUser })
-    res.end()
 })
 
 // GET /login/logout
