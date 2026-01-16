@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Drink details: <%= matchingDrink.description %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <%- include('./partials/navbar.ejs') %>
-    <h1><%= matchingDrink.description %></h1>
-    <p><%= matchingDrink.price %></p>
+
+<head>
+  <title>Drink details: <%= matchingDrink.description %>
+  </title>
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+
+<body>
+  <%- include('./partials/navbar.ejs') %>
+    <h1>
+      <%= matchingDrink.description %>
+    </h1>
+    <p>
+      <%= matchingDrink.price %>
+    </p>
     <small>ID: <%= matchingDrink.id %></small>
 
-  </body>
+</body>
+
 </html>
